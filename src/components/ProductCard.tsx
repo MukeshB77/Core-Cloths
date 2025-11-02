@@ -1,5 +1,6 @@
+import React from 'react'
 import type { Product } from '../store/useShopStore'
-import { useShopStore, formatSar, getProductPriceSar } from '../store/useShopStore'
+import { useShopStore, formatInr, getProductPriceInr } from '../store/useShopStore'
 import { HeartFilledIcon, HeartIcon } from './icons'
 
 interface ProductCardProps {
@@ -40,7 +41,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="mt-auto flex items-center justify-between gap-3">
           <div>
             <p className="text-base font-semibold text-sky-500">
-              {formatSar(getProductPriceSar(product))}
+              {formatInr(getProductPriceInr(product))}
             </p>
             <p className="mt-1 text-xs font-semibold text-rose-500">
               {product.itemsLeft} items left

@@ -3,8 +3,8 @@ import {
   useShopStore,
   buildCartLines,
   computeCartSummary,
-  formatSar,
-  getProductPriceSar,
+  formatInr,
+  getProductPriceInr,
 } from '../store/useShopStore'
 import { CloseIcon } from './icons'
 
@@ -17,9 +17,20 @@ export function CartDrawer() {
   const decrement = useShopStore((state) => state.decrementCartItem)
   const remove = useShopStore((state) => state.removeFromCart)
   const clear = useShopStore((state) => state.clearCart)
+  const user = useShopStore((state) => state.user)
+  const setAuthModalOpen = useShopStore((state) => state.setAuthModalOpen)
 
   const cartLines = useMemo(() => buildCartLines(products, cart), [products, cart])
   const cartSummary = useMemo(() => computeCartSummary(cartLines), [cartLines])
+
+  const handleCheckout = () => {
+    if (!user) {
+      setAuthModalOpen(true)
+      return
+    }
+    // Handle checkout logic here
+    alert('Proceeding to checkout!')
+  }
 
   return (
     <div
@@ -79,7 +90,7 @@ export function CartDrawer() {
                           </p>
                           <p className="text-sm font-semibold text-slate-700">{line.product.name}</p>
                           <p className="text-xs font-medium text-slate-500">
-                            {formatSar(getProductPriceSar(line.product))}
+                            {formatInr(getProductPriceInr(line.product))}
                           </p>
                         </div>
                         <button
@@ -116,7 +127,7 @@ export function CartDrawer() {
                         </button>
                       </div>
                       <p className="text-sm font-semibold text-slate-700">
-                        {formatSar(line.subtotal)}
+                        {formatInr(line.subtotal)}
                       </p>
                     </div>
                   </div>
@@ -127,28 +138,35 @@ export function CartDrawer() {
         </div>
 
         <div className="border-t border-slate-200 px-6 py-6">
-          <div className="mb-4 flex items-center justify-between text-sm font-semibold text-slate-600">
-            <span>Total</span>
-            <span>
-              {cartLines.length > 0 ? formatSar(cartSummary.totalPrice) : formatSar(0)}
-            </span>
+          {!user && (
+            <div className="mb-4 rounded-lg bg-amber-50 p-3 text-center">
+              <p className="text-sm font-medium text-amber-700">
+                Please sign in to checkout
+              </p>
+            </div>
+          )}
+          <div className="mb-4 flex items-center justify-between">
+            <p className="text-sm font-semibold text-slate-700">Subtotal</p>
+            <p className="text-lg font-bold text-slate-800">{formatInr(cartSummary.totalPrice)}</p>
           </div>
-          <div className="flex gap-3">
+          <div className="space-y-3">
             <button
               type="button"
-              onClick={clear}
+              onClick={handleCheckout}
               disabled={cartLines.length === 0}
-              className="flex-1 rounded-full border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-500 transition hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-full bg-sky-500 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-600 disabled:pointer-events-none disabled:opacity-50"
             >
-              Clear Cart
+              {user ? 'Proceed to Checkout' : 'Sign In to Checkout'}
             </button>
-            <button
-              type="button"
-              disabled={cartLines.length === 0}
-              className="flex-1 rounded-full bg-sky-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              Checkout
-            </button>
+            {cartLines.length > 0 && (
+              <button
+                type="button"
+                onClick={clear}
+                className="w-full rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-400"
+              >
+                Clear Cart
+              </button>
+            )}
           </div>
         </div>
       </aside>
